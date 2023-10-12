@@ -90,7 +90,10 @@ p = 2.61 #0.84#
 A = 2.4e6/10**(3*p) #0.06#
 density = lambda f :  A/(f0**p + f**p)
 #create bin edges for histogram
-f_bin = torch.logspace(-1.11, 1.6,steps=1001)
+f_min =-1.11;
+f_max = 1.6
+steps = 1001
+f_bin = torch.logspace(f_min, f_max,steps=steps)
 Df = torch.diff(f_bin)
 fs = f_bin[0:-1] + Df/2
 pf = density(fs)
@@ -109,6 +112,15 @@ x_data = torch.utils.data.DataLoader(x_samples,batch_size=BATCH_SIZE)
 RtVec = np.linspace(0.4,2.7,num=8)
 
 r_list = Parallel(n_jobs=16)(delayed(vary_R)(RtVec,x_data) for n in range(N_TRIALS))
+
+data = {'r_list':r_list,
+        'f0':f0,
+        'p':p,
+        'A':A,
+        'f_min':f_min,
+        'f_max':f_max,
+        'steps':steps
+        }
 
 PATH = os.getcwd() + "/data/freq_dist_N=12_q=Ising_lrs=1_7_highf2_narrowinit.pt"
 torch.save(r_list, PATH)
